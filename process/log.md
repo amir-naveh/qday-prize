@@ -78,3 +78,14 @@ Updated `solution/shor_ecdlp_classiq.py`:
 - Added `Requires: classiq >= 1.5.0` to docstring
 
 Solution is now correct for all key sizes, not just toy examples.
+
+---
+
+## 2026-03-13 — ec_point_add synthesized and verified on Classiq simulator
+
+Created `solution/test_ec_point_add_classiq.py` — minimal synthesis test for a single ECC point addition (much faster than full Shor's circuit).
+
+Result: `[7,5] + [11,5] = [8,8]` on y²=x³+7 (mod 13), which is 3G. ✅ Matches classical computation.
+Circuit metrics: **22 qubits, depth 17009** (on Classiq simulator, optimization_level=0).
+
+Key finding: the `ec_point_add` building block is quantum-correct. The full Shor's ECDLP circuit (`shor_ecdlp_classiq.py`) is next, but requires longer synthesis time.
