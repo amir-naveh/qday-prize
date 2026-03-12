@@ -34,3 +34,9 @@ Researched Classiq's capabilities relevant to ECDLP. Key findings:
 - Shor's ECDLP requires two QPE registers and quantum point addition as the unitary (much more complex than factoring)
 - Implementation plan: build bottom-up — modular add → modular mul → modular inverse → ECC point add → full ECDLP circuit
 - Target: 4-bit test vector first (`p=13`, `d=6`) for simulation validation
+
+---
+
+## 2026-03-13 — Added Classiq ECDLP notebook to resources
+
+Added `resources/elliptic_curve_discrete_log.ipynb` — Classiq's official notebook on solving ECDLP with Shor's algorithm. Source: https://github.com/Classiq/classiq-library/blob/main/algorithms/number_theory_and_cryptography/elliptic_curves/elliptic_curve_discrete_log.ipynb. This is a key reference for the quantum implementation.
