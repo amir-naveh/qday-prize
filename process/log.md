@@ -23,3 +23,14 @@ Implemented classical ECC arithmetic for curve `y² = x³ + 7 (mod p)`:
 - Brute-force ECDLP solver (feasible for small keys up to ~21 bits)
 
 Verified all 17 test vectors from `contest_information/successful_curves.json` — all passed (keypair consistency + ECDLP recovery). This serves as the classical ground truth for validating future quantum results.
+
+---
+
+## 2026-03-13 — Classiq platform research (`solution/classiq_research.md`)
+
+Researched Classiq's capabilities relevant to ECDLP. Key findings:
+- Classiq has `qpe_flexible` and `modular_multiply_constant_inplace` used in Shor's factoring
+- No native quantum ECC point addition exists — must be built from scratch using Classiq's `QNum` arithmetic
+- Shor's ECDLP requires two QPE registers and quantum point addition as the unitary (much more complex than factoring)
+- Implementation plan: build bottom-up — modular add → modular mul → modular inverse → ECC point add → full ECDLP circuit
+- Target: 4-bit test vector first (`p=13`, `d=6`) for simulation validation

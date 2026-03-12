@@ -21,12 +21,13 @@ At a high level, the quantum subroutine computes a two-register interference ove
 - Solve small keys (≤10 bit) classically as ground truth for later comparison
 
 ### Phase 2 — Quantum Circuit Design (Simulator)
-- Implement the quantum circuit for Shor's ECDLP:
-  - Quantum registers for the two exponents
-  - Quantum elliptic curve point addition as a reversible circuit
-  - QFT and measurement
-- Run and validate on a quantum simulator (e.g. Qiskit's `AerSimulator`)
-- Start with the smallest available key (4-bit) and verify correctness
+Build bottom-up in Classiq (Qmod), targeting the 4-bit test vector (`p=13`, `d=6`) first:
+1. Quantum modular addition over `F_p`
+2. Quantum modular multiplication
+3. Quantum modular inverse (for ECC slope computation)
+4. Quantum ECC point addition (`y² = x³ + 7 mod p`)
+5. Full two-register Shor's ECDLP circuit (QPE + point addition unitary)
+6. Simulate and verify output recovers correct `d`
 
 ### Phase 3 — Circuit Optimization
 - Minimize qubit count and circuit depth — the primary bottleneck on real hardware
@@ -57,4 +58,5 @@ At a high level, the quantum subroutine computes a two-register interference ove
 
 ## Status
 - ✅ Phase 1 — Classical baseline complete (`solution/ecc_classical.py`), all 17 test vectors verified
-- 🔲 Phase 2 — Quantum circuit design (next)
+- ✅ Phase 2 research — Classiq capabilities documented (`solution/classiq_research.md`)
+- 🔲 Phase 2 implementation — quantum modular arithmetic in Classiq (next)
