@@ -7,6 +7,8 @@ Adapted from the Classiq library notebook:
   resources/elliptic_curve_discrete_log.ipynb
   https://github.com/Classiq/classiq-library/blob/main/algorithms/number_theory_and_cryptography/elliptic_curves/elliptic_curve_discrete_log.ipynb
 
+Requires: classiq >= 1.5.0
+
 Target (4-bit test vector from contest_information/successful_curves.json):
   p=13, n=7, G=[11,5], Q=[11,8], d=6  (i.e. Q = 6·G)
 
@@ -17,10 +19,8 @@ Usage:
   To target a different key size, change TARGET_BITS below.
 """
 
-import math
 import numpy as np
 from classiq import *
-from classiq.qmod.symbolic import subscript
 
 # ---------------------
 # Classical Helpers
@@ -82,19 +82,6 @@ class EllipticCurvePoint(QStruct):
 
 
 @qperm
-def mock_modular_inverse(x: Const[QNum], result: QNum, modulus: int) -> None:
-    """
-    Lookup-table modular inverse: |x⟩|0⟩ → |x⟩|x⁻¹ mod modulus⟩.
-    Sets result to 0 when the inverse does not exist.
-    Practical for small p; avoids the cost of full quantum modular inversion.
-    """
-    inverse_table = lookup_table(
-        lambda _x: pow(_x, -1, modulus) if math.gcd(_x, modulus) == 1 else 0, x
-    )
-    result ^= subscript(inverse_table, x)
-
-
-@qperm
 def ec_point_add(
     ecp: EllipticCurvePoint,
     G: list[int],
@@ -104,7 +91,8 @@ def ec_point_add(
     In-place quantum ECC point addition: ecp ← ecp + G (mod p).
     G is a classically known point; ecp is the quantum register.
 
-    Implements the Weierstrass addition formula reversibly using mock_modular_inverse.
+    Uses modular_inverse_inplace — the full scalable quantum modular inverse
+    (not a lookup table), so this circuit scales to larger key sizes.
     Assumes ecp ≠ G and ecp ≠ -G (no special-case handling for doubling or identity).
     """
     n = CURVE.p.bit_length()
@@ -112,6 +100,7 @@ def ec_point_add(
     allocate(n, slope)
     t0 = QNum()
     allocate(n, t0)
+    m = QArray()   # auxiliary qubits for modular_inverse_inplace
 
     Gx, Gy = G[0], G[1]
 
@@ -120,9 +109,10 @@ def ec_point_add(
     # Step 2: x ← x1 - Gx
     modular_add_constant_inplace(p, (-Gx) % p, ecp.x)
     # Step 3: slope ← (y1 - Gy) / (x1 - Gx) mod p
+    #   modular_inverse_inplace transforms ecp.x → ecp.x⁻¹ within its scope
     within_apply(
-        lambda: mock_modular_inverse(ecp.x, t0, p),
-        lambda: modular_multiply(p, t0, ecp.y, slope),
+        lambda: modular_inverse_inplace(p, ecp.x, m),
+        lambda: modular_multiply(p, ecp.x, ecp.y, slope),
     )
     # Step 4: y ← 0  (uncompute numerator)
     within_apply(
@@ -143,14 +133,15 @@ def ec_point_add(
     # Step 7: uncompute slope
     t1 = QNum()
     within_apply(
-        lambda: mock_modular_inverse(ecp.x, t0, p),
+        lambda: modular_inverse_inplace(p, ecp.x, m),
         lambda: within_apply(
             lambda: (allocate(CURVE.p.bit_length(), t1),
-                     modular_multiply(p, t0, ecp.y, t1)),
+                     modular_multiply(p, ecp.x, ecp.y, t1)),
             lambda: inplace_xor(t1, slope),
         ),
     )
     free(slope)
+    free(t0)
     # Step 8: final coordinate adjustments → ecp = result of addition
     modular_add_constant_inplace(p, (-Gy) % p, ecp.y)
     modular_negate_inplace(p, ecp.x)
