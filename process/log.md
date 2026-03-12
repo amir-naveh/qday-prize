@@ -64,3 +64,17 @@ All 4 test cases passed (4, 6, 7, 8-bit):
 - Full post-processing pipeline recovers d correctly from the simulated distribution
 
 Post-processing is confirmed correct. Next: run `shor_ecdlp_classiq.py` with a Classiq API key to synthesize and simulate the actual quantum circuit.
+
+---
+
+## 2026-03-13 — Upgrade Classiq to 1.5.0; switch to full quantum modular inverse
+
+Discovered classiq 0.58.0 was missing all key functions (`modular_add_constant_inplace`, `modular_multiply`, `modular_square`, `modular_inverse_inplace`, `qperm`, `lookup_table`). Upgraded to classiq 1.5.0 — all functions now available.
+
+Updated `solution/shor_ecdlp_classiq.py`:
+- Removed `mock_modular_inverse` (lookup-table, doesn't scale past small p)
+- `ec_point_add` now uses `modular_inverse_inplace` — the full quantum modular inverse that scales to any key size
+- Removed `import math` (no longer needed)
+- Added `Requires: classiq >= 1.5.0` to docstring
+
+Solution is now correct for all key sizes, not just toy examples.
