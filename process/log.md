@@ -51,3 +51,16 @@ Studied the Classiq ECDLP notebook in detail and adapted it to the competition c
 - Post-processing: d ≡ -x1 · x2⁻¹ (mod n) for valid (x1, x2) pairs
 
 `shor_ecdlp_classiq.py` implements the mock variant, parameterised for all competition key sizes (4–8 bit currently), targeting the 4-bit vector by default (p=13, d=6). Ready to run with a Classiq API key.
+
+---
+
+## 2026-03-13 — Post-processing validation (`solution/test_postprocessing.py`)
+
+Classiq synthesis requires cloud authentication (API key). To de-risk before hardware runs, wrote a standalone classical test that simulates the ideal quantum measurement distribution and validates the post-processing logic independently.
+
+All 4 test cases passed (4, 6, 7, 8-bit):
+- Keypair consistency verified for all
+- Every valid (s1, s2) pair individually recovers the correct d
+- Full post-processing pipeline recovers d correctly from the simulated distribution
+
+Post-processing is confirmed correct. Next: run `shor_ecdlp_classiq.py` with a Classiq API key to synthesize and simulate the actual quantum circuit.
