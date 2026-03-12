@@ -18,6 +18,7 @@ This file defines the iteration loop for advancing the project. Each iteration f
 ### 3. Execute the Next Step
 - Carry out the step described in the latest entry of `next_steps.md`
 - Do not deviate from the defined step; if it needs to change, update `next_steps.md` first
+- Clean up code and any modifications as needed to keep the project clean and well written
 
 ### 4. Update the Log
 - Append a new dated entry to `log.md` with a high-level description of what was done and any relevant observations
@@ -27,7 +28,11 @@ This file defines the iteration loop for advancing the project. Each iteration f
 - Update it if the approach, priorities, or understanding has changed
 - Leave it unchanged if the strategy still holds
 
-### 6. Commit to GitHub
+### 6. Review the Process
+- Review this file (`next_step_process.md`) and other process files in light of what was just completed
+- Make modifications to the process if needed to better achieve the goal
+
+### 7. Commit to GitHub
 - Stage all changed and new files
 - Commit with a clear, concise message describing what was done in this iteration
 - Push to `origin main`
