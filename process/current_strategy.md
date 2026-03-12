@@ -59,4 +59,5 @@ Build bottom-up in Classiq (Qmod), targeting the 4-bit test vector (`p=13`, `d=6
 ## Status
 - ✅ Phase 1 — Classical baseline complete (`solution/ecc_classical.py`), all 17 test vectors verified
 - ✅ Phase 2 research — Classiq capabilities documented (`solution/classiq_research.md`)
-- 🔲 Phase 2 implementation — quantum modular arithmetic in Classiq (next)
+- ✅ Phase 2 implementation — `solution/shor_ecdlp_classiq.py` written, adapted from Classiq notebook to our curve
+- 🔲 Next — synthesize and simulate with Classiq (requires API key); verify 4-bit result
