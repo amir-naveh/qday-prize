@@ -40,3 +40,14 @@ Researched Classiq's capabilities relevant to ECDLP. Key findings:
 ## 2026-03-13 — Added Classiq ECDLP notebook to resources
 
 Added `resources/elliptic_curve_discrete_log.ipynb` — Classiq's official notebook on solving ECDLP with Shor's algorithm. Source: https://github.com/Classiq/classiq-library/blob/main/algorithms/number_theory_and_cryptography/elliptic_curves/elliptic_curve_discrete_log.ipynb. This is a key reference for the quantum implementation.
+
+---
+
+## 2026-03-13 — Shor's ECDLP implementation in Classiq (`solution/shor_ecdlp_classiq.py`)
+
+Studied the Classiq ECDLP notebook in detail and adapted it to the competition curve `y² = x³ + 7 (mod p)` (a=0, b=7). Key findings from the notebook:
+- Classiq provides a complete working ECDLP circuit using `mock_modular_inverse` (lookup-table) and a full quantum version using `modular_inverse_inplace`
+- The algorithm uses two quantum registers (x1, x2), initializes ecp = P_0 + x1·G + x2·(-Q), then applies inverse QFT
+- Post-processing: d ≡ -x1 · x2⁻¹ (mod n) for valid (x1, x2) pairs
+
+`shor_ecdlp_classiq.py` implements the mock variant, parameterised for all competition key sizes (4–8 bit currently), targeting the 4-bit vector by default (p=13, d=6). Ready to run with a Classiq API key.
