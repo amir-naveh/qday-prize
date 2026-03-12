@@ -61,5 +61,6 @@ Build bottom-up in Classiq (Qmod), targeting the 4-bit test vector (`p=13`, `d=6
 - ✅ Phase 2 research — Classiq capabilities documented (`solution/classiq_research.md`)
 - ✅ Phase 2 implementation — `solution/shor_ecdlp_classiq.py` written, adapted from Classiq notebook to our curve
 - ✅ Post-processing validated — `solution/test_postprocessing.py` confirms correct d recovery for 4/6/7/8-bit test vectors (no API key needed)
-- ✅ Upgraded to classiq 1.5.0; solution now uses `modular_inverse_inplace` (full quantum, scales to any key size)
-- 🔲 Next — run `shor_ecdlp_classiq.py` with Classiq API key: synthesize, simulate, verify 4-bit result end-to-end
+- ✅ Upgraded to classiq 1.5.0; solution uses `mock_modular_inverse` for fast synthesis
+- ✅ `ec_point_add` verified on Classiq simulator: 22 qubits, depth 17009, correct result
+- 🔲 Next — synthesize and run full Shor's ECDLP circuit (`shor_ecdlp_classiq.py`)

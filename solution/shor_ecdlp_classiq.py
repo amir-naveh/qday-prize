@@ -19,8 +19,10 @@ Usage:
   To target a different key size, change TARGET_BITS below.
 """
 
+import math
 import numpy as np
 from classiq import *
+from classiq.qmod.symbolic import subscript
 
 # ---------------------
 # Classical Helpers
@@ -82,6 +84,18 @@ class EllipticCurvePoint(QStruct):
 
 
 @qperm
+def mock_modular_inverse(x: Const[QNum], result: QNum, modulus: int) -> None:
+    """
+    Lookup-table modular inverse: |x⟩|0⟩ → |x⟩|x⁻¹ mod modulus⟩.
+    Fast to synthesize for small p. Used for initial simulation/verification.
+    """
+    inverse_table = lookup_table(
+        lambda _x: pow(_x, -1, modulus) if math.gcd(_x, modulus) == 1 else 0, x
+    )
+    result ^= subscript(inverse_table, x)
+
+
+@qperm
 def ec_point_add(
     ecp: EllipticCurvePoint,
     G: list[int],
@@ -91,8 +105,7 @@ def ec_point_add(
     In-place quantum ECC point addition: ecp ← ecp + G (mod p).
     G is a classically known point; ecp is the quantum register.
 
-    Uses modular_inverse_inplace — the full scalable quantum modular inverse
-    (not a lookup table), so this circuit scales to larger key sizes.
+    Uses mock_modular_inverse (lookup table) for fast synthesis on small p.
     Assumes ecp ≠ G and ecp ≠ -G (no special-case handling for doubling or identity).
     """
     n = CURVE.p.bit_length()
@@ -100,7 +113,6 @@ def ec_point_add(
     allocate(n, slope)
     t0 = QNum()
     allocate(n, t0)
-    m = QArray()   # auxiliary qubits for modular_inverse_inplace
 
     Gx, Gy = G[0], G[1]
 
@@ -109,10 +121,9 @@ def ec_point_add(
     # Step 2: x ← x1 - Gx
     modular_add_constant_inplace(p, (-Gx) % p, ecp.x)
     # Step 3: slope ← (y1 - Gy) / (x1 - Gx) mod p
-    #   modular_inverse_inplace transforms ecp.x → ecp.x⁻¹ within its scope
     within_apply(
-        lambda: modular_inverse_inplace(p, ecp.x, m),
-        lambda: modular_multiply(p, ecp.x, ecp.y, slope),
+        lambda: mock_modular_inverse(ecp.x, t0, p),
+        lambda: modular_multiply(p, t0, ecp.y, slope),
     )
     # Step 4: y ← 0  (uncompute numerator)
     within_apply(
@@ -133,15 +144,14 @@ def ec_point_add(
     # Step 7: uncompute slope
     t1 = QNum()
     within_apply(
-        lambda: modular_inverse_inplace(p, ecp.x, m),
+        lambda: mock_modular_inverse(ecp.x, t0, p),
         lambda: within_apply(
             lambda: (allocate(CURVE.p.bit_length(), t1),
-                     modular_multiply(p, ecp.x, ecp.y, t1)),
+                     modular_multiply(p, t0, ecp.y, t1)),
             lambda: inplace_xor(t1, slope),
         ),
     )
     free(slope)
-    free(t0)
     # Step 8: final coordinate adjustments → ecp = result of addition
     modular_add_constant_inplace(p, (-Gy) % p, ecp.y)
     modular_negate_inplace(p, ecp.x)
@@ -246,8 +256,8 @@ def run():
     print(f"  {TARGET_BITS}-bit key | G={GENERATOR_G} | Q={TARGET_POINT} | n={GENERATOR_ORDER}")
     print(f"  Known d={KNOWN_D} (for verification only)\n")
 
-    constraints = Constraints(optimization_parameter="width")
-    preferences = Preferences(timeout_seconds=3600, optimization_level=1, qasm3=True)
+    constraints = Constraints(max_width=100)
+    preferences = Preferences(timeout_seconds=300, optimization_level=0)
 
     print("Synthesizing...")
     qmod = create_model(main, constraints=constraints, preferences=preferences)
