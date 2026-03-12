@@ -53,5 +53,8 @@ At a high level, the quantum subroutine computes a two-register interference ove
 - **QFT resolution:** needs sufficient precision to recover `d` reliably
 
 ## Reference Implementations to Study
-- See `joes_solution/q_day_work/` — existing public attempt (Apache 2.0)
 - Other public repos listed in `competition.md`
+
+## Status
+- ✅ Phase 1 — Classical baseline complete (`solution/ecc_classical.py`), all 17 test vectors verified
+- 🔲 Phase 2 — Quantum circuit design (next)
