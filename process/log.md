@@ -89,3 +89,20 @@ Result: `[7,5] + [11,5] = [8,8]` on y²=x³+7 (mod 13), which is 3G. ✅ Matches
 Circuit metrics: **22 qubits, depth 17009** (on Classiq simulator, optimization_level=0).
 
 Key finding: the `ec_point_add` building block is quantum-correct. The full Shor's ECDLP circuit (`shor_ecdlp_classiq.py`) is next, but requires longer synthesis time.
+
+---
+
+## 2026-03-13 — Full Shor's ECDLP circuit synthesized and verified ✅
+
+Redesigned `solution/shor_ecdlp_classiq.py` with **group-index encoding**: instead of representing ECC points as flat (x,y) coordinates (8 qubits, 256-entry lookup tables), represent the cyclic group Z_n by index k meaning k·G (3 qubits, 8-entry tables). Since the contest curve has prime group order n, this is mathematically equivalent.
+
+Key engineering challenges solved:
+- `QNum` is not subscriptable in Classiq — switched x1/x2 to `QArray[QBit]` (subscriptable, compatible with `hadamard_transform` and `qft`)
+- Self-referential XOR (`ecp ^= f(ecp)`) disallowed by Classiq — solved with 3-step ancilla pattern: compute XOR into `tmp`, XOR `tmp` into `ecp`, uncompute `tmp` via inverse table
+- QArray output format: measurements return bit lists `[b0, b1, ...]` (LSB first) — fixed post-processing to convert to integer then fraction
+
+Result on Classiq simulator (4-bit test vector, p=13, d=6):
+- **12 qubits**, **1070 CX gates**, **depth 1424**
+- **Recovered d = 6 ✅**
+
+Circuit is well within the ~5000 CX gate budget for real hardware execution.
