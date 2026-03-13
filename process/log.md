@@ -138,3 +138,17 @@ Hardware feasibility summary:
 | 7-bit    | 23     | 7040     | ❌ Exceeds ~5000 CX |
 
 Decision: target 6-bit for hardware execution. To push past 6-bit, circuit optimization (optimization_level>0 in Classiq synthesis) may reduce the 7-bit gate count below the threshold — will evaluate in parallel with hardware runs.
+
+---
+
+## 2026-03-13 — Real hardware execution support added (`run_hardware()`)
+
+Added `run_hardware(backend_name, num_shots)` function to `solution/shor_ecdlp_classiq.py` for running on real IBM Quantum hardware via Classiq.
+
+Changes:
+- Refactored shared logic into `synthesize_circuit()` and `post_process_and_print()` helpers
+- `run()` retains original simulator behaviour (default path, no args)
+- `run_hardware()` configures `ExecutionPreferences` with `IBMBackendPreferences(run_via_classiq=True)` and calls `execute()` — same blocking call as simulator, but routed to real hardware
+- CLI: `python shor_ecdlp_classiq.py hardware [backend_name] [shots]` (defaults: ibm_brisbane, 4096 shots)
+
+The 4-bit circuit (TARGET_BITS=4) has 11 qubits and 716 CX gates — well within the capacity of any current IBM 127-qubit device. To execute on hardware: ensure Classiq token is set and run `python shor_ecdlp_classiq.py hardware`.

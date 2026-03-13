@@ -64,5 +64,7 @@ Build bottom-up in Classiq (Qmod), targeting the 4-bit test vector (`p=13`, `d=6
   - 4-bit: 11 qubits, 716 CX, d=6 ✅
   - 6-bit: 17 qubits, 2910 CX, d=18 ✅
 - ✅ 7-bit simulator: 23 qubits, 7040 CX — **too deep for hardware** (exceeds ~5000 CX)
-- 🔲 Phase 3 — Run 6-bit on real hardware (IBM/AWS via Classiq) — primary target
-- 🔲 Phase 3b — Try 7-bit with Classiq optimization_level>0 to reduce gate count below 5000 CX
+- ✅ Phase 3 prep — `run_hardware()` added to `shor_ecdlp_classiq.py`; IBM hardware execution ready
+- 🔲 Phase 3 — Run 4-bit on real hardware: `python shor_ecdlp_classiq.py hardware` (11 qubits, 716 CX)
+- 🔲 Phase 3b — Run 6-bit on real hardware (17 qubits, 2910 CX) — primary contest target
+- 🔲 Phase 3c — Try 7-bit with Classiq optimization_level>0 to reduce gate count below 5000 CX
