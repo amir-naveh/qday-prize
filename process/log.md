@@ -106,3 +106,18 @@ Result on Classiq simulator (4-bit test vector, p=13, d=6):
 - **Recovered d = 6 ✅**
 
 Circuit is well within the ~5000 CX gate budget for real hardware execution.
+
+---
+
+## 2026-03-13 — 6-bit test vector verified; circuit redesigned with modular arithmetic
+
+Two improvements made in this iteration:
+
+1. **Replaced lookup tables with `modular_add_constant_inplace`**: The group-index addition `ecp_idx += k mod n` is exactly a modular constant addition. Classiq's built-in implements this with a ripple-carry adder (~O(log n) gates vs O(2^n) for a generic lookup table). This eliminated all XOR tables, inverse tables, and ancilla registers from the circuit. 6-bit synthesis now succeeds in seconds.
+
+2. **Fixed post-processing formula**: The correct recovery is `d ≡ -r2·r1⁻¹ (mod n)` (from period vector (d, 1) dual condition `r1·d + r2 ≡ 0`), not `-r1·r2⁻¹`. The old formula accidentally worked for the degenerate 4-bit case (`-Q = G` → `r1 = r2`), but failed for 6-bit.
+
+6-bit results (p=43, n=31, d=18): **17 qubits, 2910 CX gates, depth 3280, d=18 ✅**
+4-bit results (p=13, n=7, d=6): **11 qubits, 716 CX gates, depth 1050, d=6 ✅**
+
+Both well within the ~5000 CX hardware budget. Next: run on real hardware and try 7-bit.
