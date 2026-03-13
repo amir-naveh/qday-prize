@@ -145,23 +145,21 @@ def extract_discrete_log(df, order, var_len):
 # Synthesize & execute
 # ---------------------
 
-def run():
-    print(f"\nQDay Prize — Shor's ECDLP on y²=x³+7 (mod {P_MOD})")
-    print(f"  G={GENERATOR_G}  Q={TARGET_POINT}  n={GENERATOR_ORDER}  known d={KNOWN_D}\n")
-
+def synthesize_circuit():
+    """Synthesize the ECDLP circuit and return the quantum program."""
     constraints = Constraints(max_width=200)
     preferences = Preferences(optimization_level=0, timeout_seconds=3600)
-
-    print("Synthesizing...")
     qmod = create_model(main, constraints=constraints, preferences=preferences)
     qprog = synthesize(qmod)
     cx = qprog.transpiled_circuit.count_ops.get("cx", "N/A")
     print(f"  Qubits:   {qprog.data.width}")
     print(f"  Depth:    {qprog.transpiled_circuit.depth}")
     print(f"  CX gates: {cx}\n")
+    return qprog
 
-    print("Executing...")
-    res = execute(qprog).result_value()
+
+def post_process_and_print(res):
+    """Extract result dataframe, run post-processing, and print recovered d."""
     df = res.dataframe.sort_values("counts", ascending=False)
     df["probability"] = df["counts"] / df["counts"].sum()
     print(df.head(10).to_string(index=False))
@@ -170,13 +168,74 @@ def run():
     df_log = extract_discrete_log(df, GENERATOR_ORDER, VAR_LEN)
     if df_log.empty:
         print("No valid measurements — try more shots or a larger register.")
-        return
+        return None
 
     d_found = int(df_log["d_candidate"].mode()[0])
     print(f"\n  Recovered d = {d_found}")
     print(f"  Expected  d = {KNOWN_D}")
     print(f"  {'✅ CORRECT' if d_found == KNOWN_D else '❌ MISMATCH'}")
+    return d_found
+
+
+def run():
+    """Run on Classiq simulator (default)."""
+    print(f"\nQDay Prize — Shor's ECDLP on y²=x³+7 (mod {P_MOD})  [SIMULATOR]")
+    print(f"  G={GENERATOR_G}  Q={TARGET_POINT}  n={GENERATOR_ORDER}  known d={KNOWN_D}\n")
+
+    print("Synthesizing...")
+    qprog = synthesize_circuit()
+
+    print("Executing on simulator...")
+    res = execute(qprog).result_value()
+    post_process_and_print(res)
+
+
+def run_hardware(backend_name="ibm_brisbane", num_shots=4096):
+    """
+    Run on real IBM Quantum hardware via Classiq.
+
+    Prerequisites:
+      - Classiq account with IBM Quantum access configured
+        (classiq.authenticate() or CLASSIQ_TOKEN env var)
+      - IBM Quantum credentials set via classiq IBMBackendPreferences
+        (run_via_classiq=True uses Classiq's IBM credentials)
+
+    Args:
+        backend_name: IBM device name (e.g. "ibm_brisbane", "ibm_kyiv",
+                      "ibm_sherbrooke"). Must have >= 11 qubits.
+        num_shots: Number of circuit executions (shots). More shots improve
+                   the signal for post-processing. 4096 is a good default.
+    """
+    print(f"\nQDay Prize — Shor's ECDLP on y²=x³+7 (mod {P_MOD})  [HARDWARE: {backend_name}]")
+    print(f"  G={GENERATOR_G}  Q={TARGET_POINT}  n={GENERATOR_ORDER}  known d={KNOWN_D}")
+    print(f"  Shots: {num_shots}\n")
+
+    print("Synthesizing...")
+    qprog = synthesize_circuit()
+
+    # Configure real hardware execution preferences
+    hw_prefs = ExecutionPreferences(
+        backend_preferences=IBMBackendPreferences(
+            backend_name=backend_name,
+            run_via_classiq=True,  # use Classiq's IBM credentials
+        ),
+        num_shots=num_shots,
+    )
+    qprog_hw = set_quantum_program_execution_preferences(qprog, hw_prefs)
+
+    print(f"Submitting to {backend_name} (this may take several minutes on the hardware queue)...")
+    job = execute(qprog_hw)
+    print(f"  Job ID: {job.id}")
+
+    print("\nTop measurement outcomes:")
+    post_process_and_print(job.result_value())
 
 
 if __name__ == "__main__":
-    run()
+    import sys
+    if len(sys.argv) > 1 and sys.argv[1] == "hardware":
+        backend = sys.argv[2] if len(sys.argv) > 2 else "ibm_brisbane"
+        shots = int(sys.argv[3]) if len(sys.argv) > 3 else 4096
+        run_hardware(backend_name=backend, num_shots=shots)
+    else:
+        run()
