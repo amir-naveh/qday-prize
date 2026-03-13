@@ -121,3 +121,20 @@ Two improvements made in this iteration:
 4-bit results (p=13, n=7, d=6): **11 qubits, 716 CX gates, depth 1050, d=6 ✅**
 
 Both well within the ~5000 CX hardware budget. Next: run on real hardware and try 7-bit.
+
+---
+
+## 2026-03-13 — 7-bit test vector verified on simulator; hardware feasibility assessed
+
+Set `TARGET_BITS=7` (p=67, n=79, d=56). Result: **23 qubits, 7040 CX, depth 6452, d=56 ✅**
+
+The circuit is correct but 7040 CX exceeds the ~5000 CX hardware fidelity budget.
+
+Hardware feasibility summary:
+| Key size | Qubits | CX gates | Hardware feasible? |
+|----------|--------|----------|--------------------|
+| 4-bit    | 11     | 716      | ✅ Yes             |
+| 6-bit    | 17     | 2910     | ✅ Yes             |
+| 7-bit    | 23     | 7040     | ❌ Exceeds ~5000 CX |
+
+Decision: target 6-bit for hardware execution. To push past 6-bit, circuit optimization (optimization_level>0 in Classiq synthesis) may reduce the 7-bit gate count below the threshold — will evaluate in parallel with hardware runs.
