@@ -67,5 +67,11 @@ Build bottom-up in Classiq (Qmod), targeting the 4-bit test vector (`p=13`, `d=6
 - ✅ Phase 3 — 4-bit executed on **Rigetti Ankaa-3** (AWS Braket via Classiq), d=6 recovered ✅
   - Hardware: 11 qubits, 716 CX, 4096 shots, Job `b9c03bef`
   - IBM/IonQ: fail with "insufficient budget" — AWS Braket is the active hardware path
-- 🔲 Phase 3b — Run 6-bit on Ankaa-3 (17 qubits, 2910 CX) — **primary contest target**
-- 🔲 Phase 3c — Try 7-bit with Classiq optimization_level>0 to reduce gate count below 5000 CX
+- ⚠️  Phase 3b — 6-bit hardware: **blocked** (all hardware paths exhausted or insufficient)
+  - IonQ direct: budget exhausted ($1191 spent on 4-bit alone)
+  - IonQ via Braket (Forte 1): gate×shots limit allows max ~127 shots — too noisy
+  - Ankaa-3: 2910 CX → ~10⁻¹² fidelity, zero signal even with 4096 shots
+  - IonQ via Azure: "insufficient budget" despite $1000 allocation
+  - QFT-space adder (1252 CX, 16q) verified on simulator ✅ but Forte 1 still too noisy at 127 shots
+- ✅ Phase 3b fallback — 6-bit confirmed on **simulator** (ripple-carry: 17q/2910CX ✅, QFT-space: 16q/1252CX ✅)
+- 🔲 Phase 4 — Prepare competition submission: 4-bit hardware (2 devices) + 6-bit simulator

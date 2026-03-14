@@ -168,7 +168,7 @@ Notes on hardware execution:
 - With 256 shots the result was too noisy to recover d; 4096 shots gave a clear mode.
 - The hardware output is noisy (counts ~10–40 per outcome vs 256-shot flat noise), but post-processing correctly finds d=6 as the mode of valid (r1, r2) pairs.
 
-This is the first successful real hardware run of Shor's ECDLP for the competition curve.
+This is the first successful real hardware run of Shor's ECDLP for the competition curve. The 4-bit result stands as the hardware contribution.
 
 **Bonus: IonQ Forte-1 also succeeded** (background job, same session):
 - Job ID: `f6da2c51-e4e0-4922-9ade-066392a42362`
@@ -176,4 +176,26 @@ This is the first successful real hardware run of Shor's ECDLP for the competiti
 - IonQ via Classiq (`IonqBackendPreferences`, `run_via_classiq=True`)
 - Lower noise than Ankaa-3 (trapped-ion fidelity); 1024 shots was sufficient
 
-Both Ankaa-3 (superconducting) and IonQ Forte-1 (trapped-ion) recover the correct key. Next: run 6-bit (17 qubits, 2910 CX).
+Both Ankaa-3 (superconducting) and IonQ Forte-1 (trapped-ion) recover the correct key.
+
+---
+
+## 2026-03-14 — 6-bit hardware feasibility analysis; QFT-space adder variant
+
+Attempted to run 6-bit (n=31, d=18) on real hardware. All paths blocked:
+
+| Path | Status | Reason |
+|---|---|---|
+| IonQ direct (`run_via_classiq`) | ❌ | Budget exhausted: $1191 used (4-bit alone cost $1191) |
+| IonQ Forte-1 via Braket | ❌ | Gate×shots limit: `gates × shots ≤ 1,000,000`; max ~127 shots |
+| Ankaa-3 (Rigetti, Braket) | ❌ | 2910 CX × ~99% fidelity ≈ 10⁻¹² signal — essentially zero |
+| IonQ via Azure Quantum | ❌ | "Insufficient budget" despite $1000 Azure allocation showing |
+
+**QFT-space adder optimization (new variant):**
+Redesigned `ecp_idx` arithmetic using `modular_add_qft_space` (keep ecp register in QFT space, use phase rotations instead of ripple-carry adder). Verified on simulator:
+- **16 qubits, 1252 CX** (vs 17 qubits, 2910 CX with ripple-carry) — 57% reduction ✅
+- d=18 correctly recovered on simulator ✅
+
+Even with 1252 CX on IonQ Forte-1 via Braket: max shots ≈ 127, which produces pure noise (100 shots yielded flat histogram, d wrong). Need ≥500 shots for reliable signal recovery.
+
+**Conclusion:** 6-bit requires either a much more compact circuit, higher-budget access, or IonQ direct without the Braket gate×shot limit. The 4-bit hardware result (two devices) is the strongest achievable with current budget. 6-bit is confirmed on simulator.
