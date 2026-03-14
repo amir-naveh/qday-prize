@@ -31,7 +31,7 @@ CURVE_PARAMS = {
     8: dict(p=163, n=139, G=[112, 53], Q=[122, 144],  d=103),
 }
 
-TARGET_BITS     = 4
+TARGET_BITS     = 6
 params          = CURVE_PARAMS[TARGET_BITS]
 P_MOD           = params["p"]
 GENERATOR_ORDER = params["n"]   # prime order of the generator
