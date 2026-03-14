@@ -190,18 +190,18 @@ def run():
     post_process_and_print(res)
 
 
-def run_hardware(backend_name="Ankaa-3", num_shots=4096):
+def run_hardware(backend_name="qpu.forte-1", provider="ionq", num_shots=2048):
     """
-    Run on real quantum hardware via Classiq using AWS Braket.
+    Run on real quantum hardware via Classiq.
 
-    Uses Classiq's AWS Braket allocation (run_via_classiq=True).
-    Available AWS Braket hardware (from classiq budget):
-      Ankaa-3  — Rigetti, 82 qubits, superconducting
-      Forte 1  — IonQ, 36 qubits, trapped-ion (higher fidelity)
+    Both backends confirmed working (4-bit, d=6):
+      IonQ Forte-1 (qpu.forte-1) — trapped-ion, 36 qubits, higher fidelity, 1024 shots sufficient
+      Rigetti Ankaa-3 (Ankaa-3)  — superconducting, 82 qubits, 4096 shots needed
 
     Args:
-        backend_name: Device name. Default: Ankaa-3.
-        num_shots: Number of shots. Default: 4096.
+        backend_name: Device name. Default: qpu.forte-1 (IonQ).
+        provider: "ionq" or "braket". Controls which backend preferences class is used.
+        num_shots: Number of shots. Default: 2048.
     """
     print(f"\nQDay Prize — Shor's ECDLP on y²=x³+7 (mod {P_MOD})  [HARDWARE: {backend_name}]")
     print(f"  G={GENERATOR_G}  Q={TARGET_POINT}  n={GENERATOR_ORDER}  known d={KNOWN_D}")
@@ -210,12 +210,19 @@ def run_hardware(backend_name="Ankaa-3", num_shots=4096):
     print("Synthesizing...")
     qprog = synthesize_circuit()
 
-    # Configure AWS Braket hardware execution via Classiq's credentials
-    hw_prefs = ExecutionPreferences(
-        backend_preferences=AwsBackendPreferences(
+    if provider == "ionq":
+        backend_prefs = IonqBackendPreferences(
             backend_name=backend_name,
             run_via_classiq=True,
-        ),
+        )
+    else:
+        backend_prefs = AwsBackendPreferences(
+            backend_name=backend_name,
+            run_via_classiq=True,
+        )
+
+    hw_prefs = ExecutionPreferences(
+        backend_preferences=backend_prefs,
         num_shots=num_shots,
     )
     qprog_hw = set_quantum_program_execution_preferences(qprog, hw_prefs)
@@ -231,8 +238,9 @@ def run_hardware(backend_name="Ankaa-3", num_shots=4096):
 if __name__ == "__main__":
     import sys
     if len(sys.argv) > 1 and sys.argv[1] == "hardware":
-        backend = sys.argv[2] if len(sys.argv) > 2 else "Ankaa-3"
-        shots = int(sys.argv[3]) if len(sys.argv) > 3 else 4096
-        run_hardware(backend_name=backend, num_shots=shots)
+        backend = sys.argv[2] if len(sys.argv) > 2 else "qpu.forte-1"
+        provider = sys.argv[3] if len(sys.argv) > 3 else "ionq"
+        shots = int(sys.argv[4]) if len(sys.argv) > 4 else 2048
+        run_hardware(backend_name=backend, provider=provider, num_shots=shots)
     else:
         run()
