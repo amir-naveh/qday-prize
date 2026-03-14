@@ -152,3 +152,20 @@ Changes:
 - CLI: `python shor_ecdlp_classiq.py hardware [backend_name] [shots]` (defaults: ibm_brisbane, 4096 shots)
 
 The 4-bit circuit (TARGET_BITS=4) has 11 qubits and 716 CX gates — well within the capacity of any current IBM 127-qubit device. To execute on hardware: ensure Classiq token is set and run `python shor_ecdlp_classiq.py hardware`.
+
+---
+
+## 2026-03-14 — 4-bit Shor's ECDLP executed on real quantum hardware ✅
+
+Successfully ran the 4-bit circuit on **Rigetti Ankaa-3** (82-qubit superconducting device) via AWS Braket through Classiq. Job ID: `b9c03bef-24d9-4c84-aabb-a3ddcb80d3ff`.
+
+- **Shots:** 4096
+- **Circuit:** 11 qubits, 716 CX gates, depth 1050
+- **Recovered d = 6 ✅**  (expected d = 6)
+
+Notes on hardware execution:
+- IBM Quantum and IonQ backends fail with "insufficient budget" — AWS Braket is the working hardware path via Classiq.
+- With 256 shots the result was too noisy to recover d; 4096 shots gave a clear mode.
+- The hardware output is noisy (counts ~10–40 per outcome vs 256-shot flat noise), but post-processing correctly finds d=6 as the mode of valid (r1, r2) pairs.
+
+This is the first successful real hardware run of Shor's ECDLP for the competition curve. Next: run 6-bit (17 qubits, 2910 CX) on Ankaa-3.

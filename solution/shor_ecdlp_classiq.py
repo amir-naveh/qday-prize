@@ -190,21 +190,18 @@ def run():
     post_process_and_print(res)
 
 
-def run_hardware(backend_name="ibm_brisbane", num_shots=4096):
+def run_hardware(backend_name="Ankaa-3", num_shots=4096):
     """
-    Run on real IBM Quantum hardware via Classiq.
+    Run on real quantum hardware via Classiq using AWS Braket.
 
-    Prerequisites:
-      - Classiq account with IBM Quantum access configured
-        (classiq.authenticate() or CLASSIQ_TOKEN env var)
-      - IBM Quantum credentials set via classiq IBMBackendPreferences
-        (run_via_classiq=True uses Classiq's IBM credentials)
+    Uses Classiq's AWS Braket allocation (run_via_classiq=True).
+    Available AWS Braket hardware (from classiq budget):
+      Ankaa-3  — Rigetti, 82 qubits, superconducting
+      Forte 1  — IonQ, 36 qubits, trapped-ion (higher fidelity)
 
     Args:
-        backend_name: IBM device name (e.g. "ibm_brisbane", "ibm_kyiv",
-                      "ibm_sherbrooke"). Must have >= 11 qubits.
-        num_shots: Number of circuit executions (shots). More shots improve
-                   the signal for post-processing. 4096 is a good default.
+        backend_name: Device name. Default: Ankaa-3.
+        num_shots: Number of shots. Default: 4096.
     """
     print(f"\nQDay Prize — Shor's ECDLP on y²=x³+7 (mod {P_MOD})  [HARDWARE: {backend_name}]")
     print(f"  G={GENERATOR_G}  Q={TARGET_POINT}  n={GENERATOR_ORDER}  known d={KNOWN_D}")
@@ -213,11 +210,11 @@ def run_hardware(backend_name="ibm_brisbane", num_shots=4096):
     print("Synthesizing...")
     qprog = synthesize_circuit()
 
-    # Configure real hardware execution preferences
+    # Configure AWS Braket hardware execution via Classiq's credentials
     hw_prefs = ExecutionPreferences(
-        backend_preferences=IBMBackendPreferences(
+        backend_preferences=AwsBackendPreferences(
             backend_name=backend_name,
-            run_via_classiq=True,  # use Classiq's IBM credentials
+            run_via_classiq=True,
         ),
         num_shots=num_shots,
     )
@@ -234,7 +231,7 @@ def run_hardware(backend_name="ibm_brisbane", num_shots=4096):
 if __name__ == "__main__":
     import sys
     if len(sys.argv) > 1 and sys.argv[1] == "hardware":
-        backend = sys.argv[2] if len(sys.argv) > 2 else "ibm_brisbane"
+        backend = sys.argv[2] if len(sys.argv) > 2 else "Ankaa-3"
         shots = int(sys.argv[3]) if len(sys.argv) > 3 else 4096
         run_hardware(backend_name=backend, num_shots=shots)
     else:
