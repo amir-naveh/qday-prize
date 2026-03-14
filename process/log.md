@@ -168,4 +168,12 @@ Notes on hardware execution:
 - With 256 shots the result was too noisy to recover d; 4096 shots gave a clear mode.
 - The hardware output is noisy (counts ~10–40 per outcome vs 256-shot flat noise), but post-processing correctly finds d=6 as the mode of valid (r1, r2) pairs.
 
-This is the first successful real hardware run of Shor's ECDLP for the competition curve. Next: run 6-bit (17 qubits, 2910 CX) on Ankaa-3.
+This is the first successful real hardware run of Shor's ECDLP for the competition curve.
+
+**Bonus: IonQ Forte-1 also succeeded** (background job, same session):
+- Job ID: `f6da2c51-e4e0-4922-9ade-066392a42362`
+- Shots: 1024, Recovered d = 6 ✅
+- IonQ via Classiq (`IonqBackendPreferences`, `run_via_classiq=True`)
+- Lower noise than Ankaa-3 (trapped-ion fidelity); 1024 shots was sufficient
+
+Both Ankaa-3 (superconducting) and IonQ Forte-1 (trapped-ion) recover the correct key. Next: run 6-bit (17 qubits, 2910 CX).
