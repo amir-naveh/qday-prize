@@ -199,3 +199,34 @@ Redesigned `ecp_idx` arithmetic using `modular_add_qft_space` (keep ecp register
 Even with 1252 CX on IonQ Forte-1 via Braket: max shots ≈ 127, which produces pure noise (100 shots yielded flat histogram, d wrong). Need ≥500 shots for reliable signal recovery.
 
 **Conclusion:** 6-bit requires either a much more compact circuit, higher-budget access, or IonQ direct without the Braket gate×shot limit. The 4-bit hardware result (two devices) is the strongest achievable with current budget. 6-bit is confirmed on simulator.
+
+---
+
+## 2026-03-15 — Final 6-bit hardware run on IonQ Forte-1 (Step 12) — ❌ noise-dominated
+
+Executed the 6-bit QFT-space circuit (16q, 1252 CX) on IonQ Forte-1 direct via Classiq. Job ID: `f4469cd0-80d7-4b01-8c71-12b85c6b1792`.
+
+- **Shots:** 100 (Braket gate×shots constraint: 1252 CX × N ≤ 1,000,000 → max ~795 shots; used 100 as test)
+- **Circuit:** 16 qubits, 1252 CX gates, depth 1271
+- **Result:** max count 2/100 — completely flat histogram (pure hardware noise)
+- **Recovered d ≠ 18 ❌** (expected d=18)
+
+**Post-mortem fidelity analysis:**
+
+Reverse-engineering from the 4-bit run (716 CX, IonQ Forte-1, 1024 shots, d=6 ✅):
+- 4-bit effective circuit fidelity: ~4.8% → implied per-gate fidelity: ~99.58%
+- 6-bit (1252 CX): predicted circuit fidelity: ~0.7% → ~0.07 expected signal shots per peak at 100 shots
+- Shots needed for 5σ margin: **~31,527 shots**
+- Estimated cost at $0.001625/CX/shot: **~$64,151**
+- Current IonQ balance: ~$6,808 — **infeasible**
+
+The Braket gate×shots limit (≤1,000,000) additionally caps us at ~795 shots for this circuit even if budget were available, far short of the ~31,527 needed.
+
+**Final hardware status:**
+| Circuit | Device | Shots | Result |
+|---|---|---|---|
+| 4-bit (716 CX) | Rigetti Ankaa-3 | 4096 | d=6 ✅ Job b9c03bef |
+| 4-bit (716 CX) | IonQ Forte-1 | 1024 | d=6 ✅ Job f6da2c51 |
+| 6-bit (1252 CX) | IonQ Forte-1 | 100 | ❌ noise Job f4469cd0 |
+
+**Competition result:** 4-bit key recovered on two different quantum hardware devices (superconducting + trapped-ion). 6-bit confirmed correct on Classiq simulator. This is the final hardware contribution.

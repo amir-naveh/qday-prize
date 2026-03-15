@@ -74,4 +74,5 @@ Build bottom-up in Classiq (Qmod), targeting the 4-bit test vector (`p=13`, `d=6
   - IonQ via Azure: "insufficient budget" despite $1000 allocation
   - QFT-space adder (1252 CX, 16q) verified on simulator ✅ but Forte 1 still too noisy at 127 shots
 - ✅ Phase 3b fallback — 6-bit confirmed on **simulator** (ripple-carry: 17q/2910CX ✅, QFT-space: 16q/1252CX ✅)
+- ❌ Phase 3c — Final 6-bit hardware attempt on IonQ Forte-1 (Job f4469cd0): noise-dominated, d wrong. Post-mortem: ~31,527 shots needed for reliable signal (~$64K), far exceeding budget. **Hardware is complete.**
 - 🔲 Phase 4 — Prepare competition submission: 4-bit hardware (2 devices) + 6-bit simulator
