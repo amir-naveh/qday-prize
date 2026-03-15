@@ -204,12 +204,12 @@ Even with 1252 CX on IonQ Forte-1 via Braket: max shots ≈ 127, which produces 
 
 ## 2026-03-15 — Final 6-bit hardware run on IonQ Forte-1 (Step 12) — ❌ noise-dominated
 
-Executed the 6-bit QFT-space circuit (16q, 1252 CX) on IonQ Forte-1 direct via Classiq. Job ID: `f4469cd0-80d7-4b01-8c71-12b85c6b1792`.
+Executed the 6-bit QFT-space circuit (16q, 1252 CX) on IonQ Forte-1 direct via Classiq. Job ID: `589b1f34-610d-4f6c-9329-64d9459c6fa6`.
 
-- **Shots:** 100 (Braket gate×shots constraint: 1252 CX × N ≤ 1,000,000 → max ~795 shots; used 100 as test)
-- **Circuit:** 16 qubits, 1252 CX gates, depth 1271
-- **Result:** max count 2/100 — completely flat histogram (pure hardware noise)
-- **Recovered d ≠ 18 ❌** (expected d=18)
+- **Shots:** 1024
+- **Circuit:** 16 qubits, 1252 CX gates, depth 1271, total gates 2591
+- **Result:** max count 3/1024 (0.29%) — completely flat histogram (pure hardware noise)
+- **Recovered d = 6 ≠ 18 ❌** (wrong; noise-driven mode)
 
 **Post-mortem fidelity analysis:**
 
@@ -227,6 +227,6 @@ The Braket gate×shots limit (≤1,000,000) additionally caps us at ~795 shots f
 |---|---|---|---|
 | 4-bit (716 CX) | Rigetti Ankaa-3 | 4096 | d=6 ✅ Job b9c03bef |
 | 4-bit (716 CX) | IonQ Forte-1 | 1024 | d=6 ✅ Job f6da2c51 |
-| 6-bit (1252 CX) | IonQ Forte-1 | 100 | ❌ noise Job f4469cd0 |
+| 6-bit (1252 CX) | IonQ Forte-1 | 1024 | ❌ noise Job 589b1f34 |
 
 **Competition result:** 4-bit key recovered on two different quantum hardware devices (superconducting + trapped-ion). 6-bit confirmed correct on Classiq simulator. This is the final hardware contribution.
