@@ -230,3 +230,32 @@ The Braket gate×shots limit (≤1,000,000) additionally caps us at ~795 shots f
 | 6-bit (1252 CX) | IonQ Forte-1 | 1024 | ❌ noise Job 589b1f34 |
 
 **Competition result:** 4-bit key recovered on two different quantum hardware devices (superconducting + trapped-ion). 6-bit confirmed correct on Classiq simulator. This is the final hardware contribution.
+
+---
+
+## 2026-03-18 — IBM Quantum access established; 4-bit and 6-bit runs on ibm_pittsburgh
+
+Established IBM Quantum access via IBM Cloud credentials. Confirmed connectivity with a Bell state test (Job `dec46f65`, ibm_pittsburgh, 256 shots — |00⟩+|11⟩ at 98.8% ✅, cost $0.00).
+
+**4-bit Shor's ECDLP on ibm_pittsburgh** (Job `56c3b591`, 1024 shots):
+- Circuit: 11 qubits, 716 CX, depth 1050
+- Result: **d=6 ✅** (expected 6)
+- Cost: **$0.00** — IBM bills by QPU time, not gate×shot
+- Histogram noisy but signal recoverable via mode of valid (r1,r2) pairs
+
+**6-bit QFT-space on ibm_pittsburgh** (Job `2a8166f7`, 1024 shots):
+- Circuit: 16 qubits, 1252 CX, depth 1271
+- Result: d=23 ❌ (expected 18) — max count 3/1024, flat histogram
+- Same noise floor as IonQ: IBM superconducting per-gate fidelity ~99.5% → 0.995^1252 ≈ 0.0015 circuit fidelity → ~1.5 signal shots per peak at 1024 shots
+- Cost: **$0.00**
+
+**Updated hardware scorecard:**
+| Circuit | Device | Type | Shots | Result | Cost |
+|---|---|---|---|---|---|
+| 4-bit (716 CX) | Rigetti Ankaa-3 | Superconducting | 4096 | d=6 ✅ | ~$5 |
+| 4-bit (716 CX) | IonQ Forte-1 | Trapped-ion | 1024 | d=6 ✅ | ~$1,191 |
+| 4-bit (716 CX) | IBM Pittsburgh | Superconducting | 1024 | d=6 ✅ | $0 |
+| 6-bit (1252 CX) | IonQ Forte-1 | Trapped-ion | 1024 | ❌ noise | ~$2,091 |
+| 6-bit (1252 CX) | IBM Pittsburgh | Superconducting | 1024 | ❌ noise | $0 |
+
+Conclusion: 6-bit is hardware-infeasible on all currently accessible devices. The 4-bit result is now confirmed on 3 devices across 3 different hardware vendors.
