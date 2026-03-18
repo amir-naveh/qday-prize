@@ -1,8 +1,8 @@
 # QDay Prize Submission — Amir Naveh
 
-**Contact:** [YOUR-EMAIL]
+**Contact:** amir@classiq.io
 
-**Professional background:** [YOUR-BACKGROUND — e.g., "Software engineer with background in quantum computing and cryptography"]
+**Professional background:** Co-founder and Head of Algorithms at Classiq Technologies, leading R&D in quantum software design automation and circuit synthesis. Algorithms researcher and developer with over 20 patents in quantum computing.
 
 ---
 

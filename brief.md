@@ -1,6 +1,6 @@
 # Shor's Algorithm for ECDLP on Real Quantum Hardware
 
-**QDay Prize Submission** | Amir Naveh | April 2026
+**QDay Prize Submission** | Amir Naveh (amir@classiq.io) | April 2026
 
 ---
 
