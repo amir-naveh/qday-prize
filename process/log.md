@@ -259,3 +259,32 @@ Established IBM Quantum access via IBM Cloud credentials. Confirmed connectivity
 | 6-bit (1252 CX) | IBM Pittsburgh | Superconducting | 1024 | ❌ noise | $0 |
 
 Conclusion: 6-bit is hardware-infeasible on all currently accessible devices. The 4-bit result is now confirmed on 3 devices across 3 different hardware vendors.
+
+---
+
+## 2026-03-18 — Calibration-corrected matched filter on ibm_fez — ❌ signal undetectable
+
+Ran 18 interleaved jobs on **ibm_fez** (9 signal + 9 null, 8192 shots each = 73,728 shots per circuit):
+- **Signal** (d=18, NEG_Q_STEP=13): Jobs 59ae7ba4, 83dd3487, 5b3886d8, 0f12d67a, 413469d7, 6fde9e92, 2cd25075, 353d56b3, ca5d01bd
+- **Null** (d=20, NEG_Q_STEP=11, same circuit structure): Jobs 2d98f150, 83d9a6fd, 791cc38e, 2dc0a02f, c08eae57, f73587c5, 53851009, 8d467ba2, c4648c55
+
+**Calibration-corrected matched filter analysis** (`analysis/calibrated_mf_analysis.py`):
+- Method: T_net(d) = Σ_x (counts_sig[x] - counts_null[x]) × P_ideal(x|d) for each candidate d ∈ {0..30}
+- Null subtraction was intended to cancel IBM's amplitude-damping noise bias (|0⟩-favoring)
+- Result: **d=18 ranked 22nd out of 31** — no signal detected
+
+T_net scores for all d: range 0.08–0.43, all positive (no negatives). d=0 ranked first (T=0.43), d=18 scored 0.15 (near median).
+
+**Root cause:** Circuit fidelity ≈ 0.15% (0.995^1252 ≈ 0.0015). Over 73,728 shots, only ~110 shots carry signal information. Residual noise between interleaved signal and null jobs (calibration drift, slight timing differences) swamps the ~0.15% signal excess. The null subtraction cannot fully cancel device noise at this fidelity level.
+
+**Conclusion:** 6-bit ECDLP on IBM (or any current superconducting device) requires either: (a) hardware fidelity improvements bringing CX error below ~0.1%, (b) a circuit with <300 CX gates for the 6-bit problem, or (c) ~10M total shots. None of these are achievable in the current timeframe.
+
+**Final hardware status (complete):**
+| Circuit | Device | Type | Shots | Result | Cost |
+|---|---|---|---|---|---|
+| 4-bit (716 CX) | Rigetti Ankaa-3 | Superconducting | 4096 | d=6 ✅ Job b9c03bef | ~$5 |
+| 4-bit (716 CX) | IonQ Forte-1 | Trapped-ion | 1024 | d=6 ✅ Job f6da2c51 | ~$1,191 |
+| 4-bit (716 CX) | IBM Pittsburgh | Superconducting | 1024 | d=6 ✅ Job 56c3b591 | $0 |
+| 6-bit (1252 CX) | IonQ Forte-1 | Trapped-ion | 1024 | ❌ noise Job 589b1f34 | ~$2,091 |
+| 6-bit (1252 CX) | IBM Pittsburgh | Superconducting | 1024 | ❌ noise Job 2a8166f7 | $0 |
+| 6-bit (1252 CX) | IBM ibm_fez | Superconducting | 73,728×2 | ❌ noise (calibration) | $0 |

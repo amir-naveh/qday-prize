@@ -76,4 +76,5 @@ Build bottom-up in Classiq (Qmod), targeting the 4-bit test vector (`p=13`, `d=6
 - ✅ Phase 3b fallback — 6-bit confirmed on **simulator** (ripple-carry: 17q/2910CX ✅, QFT-space: 16q/1252CX ✅)
 - ❌ Phase 3c — Final 6-bit hardware attempt on IonQ Forte-1 (Job 589b1f34, 1024 shots): noise-dominated, d wrong. Post-mortem: ~31,527 shots needed for reliable signal (~$64K), far exceeding budget.
 - ✅ Phase 3d — IBM Quantum access established (ibm_cloud). 4-bit d=6 ✅ on ibm_pittsburgh (Job 56c3b591, $0). 6-bit ❌ noise on ibm_pittsburgh (Job 2a8166f7, $0). Same fidelity limit as IonQ. **Hardware is complete — 4-bit confirmed on 3 devices (Rigetti, IonQ, IBM).**
+- ❌ Phase 3e — ibm_fez calibration run: 18 interleaved signal+null jobs (73,728 shots each), calibration-corrected matched filter → d=18 ranked 22/31. Null subtraction cannot overcome 0.15% circuit fidelity. **6-bit hardware definitively infeasible on all current hardware.**
 - 🔲 Phase 4 — Prepare competition submission: 4-bit hardware (3 devices) + 6-bit simulator
