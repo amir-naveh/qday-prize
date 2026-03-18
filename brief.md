@@ -41,7 +41,7 @@ Circuit: 16 qubits, 1,252 CX (QFT-space variant). Correct `d=18` recovered on Cl
 
 ## Hardware Requirements and Limitations
 
-**Current hardware (NISQ era):** Each additional CX gate reduces circuit fidelity by ~0.5%. For a reliable 6-bit result (1,252 CX), approximately 30,000 shots would be required at current fidelity levels — costing ~$64K on IonQ and impractical on IBM within the gate×shot billing limit of AWS Braket.
+**Current hardware (NISQ era):** Each additional CX gate reduces circuit fidelity by ~0.5%. For a reliable 6-bit result (1,252 CX), approximately 30,000 shots would be required at current fidelity levels. On IBM the circuit fidelity is ~0.15% (0.995^1252), producing only ~110 usable signal shots even after 73,728 shots with calibration-baseline subtraction — insufficient to overcome noise. On IonQ the fidelity is slightly higher (~0.7%) but the cost for the required shot count (~$64K) exceeds available budget.
 
 **Path to larger keys:** The gate count for our circuit scales as `O(n · log n)` CX gates (ripple-carry) or `O(n · log² n)` (QFT-space). For `n`-bit keys, the CX count grows polynomially but exceeds current hardware fidelity budgets past ~4 bits. Breaking a 256-bit secp256k1 key would require fault-tolerant quantum computers with millions of physical qubits operating below the fault-tolerance threshold — far beyond current hardware.
 
