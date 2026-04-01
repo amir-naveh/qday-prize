@@ -9,7 +9,7 @@
 | Dor Harpaz | dor@classiq.io | Classiq Technologies |
 | Or Samimi Golan | orsa@classiq.io | Classiq Technologies |
 
-**GitHub:** https://github.com/classiqdor/QPrize
+**GitHub:** https://github.com/amir-naveh/qday-prize/
 
 ---
 
