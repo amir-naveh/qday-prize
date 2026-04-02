@@ -41,7 +41,7 @@ We provide two implementations:
 The 4-bit circuit was executed on four devices across three vendors:
 
 | Device | Vendor | Type | Qubits | Access |
-|--------|--------|------|--------|-------------|--------|
+|--------|--------|------|--------|--------|
 | IBM ibm_torino (Heron r1) | IBM Quantum | Superconducting | 133 | IBM Cloud direct |
 | IonQ Forte-1 | IonQ | Trapped-ion | 36 | Classiq SDK |
 | IBM ibm_pittsburgh | IBM Quantum | Superconducting | 127 | IBM Cloud direct |
