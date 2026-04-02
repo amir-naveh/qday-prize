@@ -110,3 +110,4 @@ PLAN.md                — optimization roadmap and decisions
 - `PLAN.md` — strategic plan, oracle method comparison, optimization roadmap
 - `worklog/` — per-session activity logs (2026-03-29 to present)
 - `research.md` — paper notes and references
+
